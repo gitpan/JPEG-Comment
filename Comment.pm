@@ -6,7 +6,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 @ISA = qw(Exporter);
 @EXPORT=qw(jpegcomment);
-$VERSION='0.1';
+$VERSION='0.2';
 
 
 sub jpegcomment($$){
@@ -22,8 +22,9 @@ sub jpegcomment($$){
          push @datas, substr($image,$i,length($image)-$i);
          last;
       }      
-      $i+=2, next if ( $pre == 0xFFFE or $pre == 0xFFD8 ); # изначальный комментарий. нафиг или конец, которого быть не должно
       my $cnt=unpack('n',substr($image,$i+2,2));
+      $i+=$cnt+2, next if ( $pre == 0xFFFE ); # изначальный комментарий. нафиг 
+      die if ( $pre == 0xFFD8 );              #или конец, которого быть не должно
       push @datas, substr($image,$i,$cnt+2);
       $i+=$cnt+2;
       last if $i >= length($image);
